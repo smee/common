@@ -1,4 +1,7 @@
-(ns com.github.smee.time
+(ns 
+  ^{:author "Steffen Dienst",
+    :doc "useful time handling functions"}
+  com.github.smee.time
   (:use [clojure.contrib.def :only (defvar-)]
         [clojure.contrib.singleton :only (per-thread-singleton)]))
 

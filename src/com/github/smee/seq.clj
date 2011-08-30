@@ -1,4 +1,7 @@
-(ns com.github.smee.seq
+(ns 
+  ^{:author "Steffen Dienst",
+    :doc "useful sequence handling functions"}
+  com.github.smee.seq
   (:use
     [clojure.contrib.seq :only (indexed)]))
 

@@ -1,4 +1,7 @@
-(ns com.github.smee.util
+(ns 
+  ^{:author "Steffen Dienst",
+    :doc "useful misc. functions"}
+  com.github.smee.util
   (:use [clojure.stacktrace :only (print-cause-trace print-stack-trace)]
         [clojure.contrib.pprint :only (cl-format)]
         [clojure.contrib.seq :only (indexed)])

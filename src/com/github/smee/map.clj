@@ -1,4 +1,7 @@
-(ns com.github.smee.map)
+(ns 
+  ^{:author "Steffen Dienst",
+    :doc "useful map processing functions"}
+  com.github.smee.map)
 
 (defn map-values 
   "Change all map values by applying f to each one."
