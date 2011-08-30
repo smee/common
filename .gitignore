@@ -1,0 +1,6 @@
+classes/
+lib/
+bin/
+.*
+*jar
+pom.xml
