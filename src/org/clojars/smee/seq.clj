@@ -1,7 +1,7 @@
 (ns 
   ^{:author "Steffen Dienst",
     :doc "useful sequence handling functions"}
-  com.github.smee.seq
+  org.clojars.smee.seq
   (:use
     [clojure.contrib.seq :only (indexed)]))
 

@@ -1,7 +1,7 @@
 (ns 
   ^{:author "Steffen Dienst",
     :doc "useful file handling functions"}
-  com.github.smee.file
+  org.clojars.smee.file
   (:use 
     [clojure.java.io :only (file reader)]
     [clojure.contrib.string :only (replace-char)])

@@ -1,7 +1,7 @@
 (ns 
   ^{:author "Steffen Dienst",
     :doc "useful misc. functions"}
-  com.github.smee.util
+  org.clojars.smee.util
   (:use [clojure.stacktrace :only (print-cause-trace print-stack-trace)]
         [clojure.contrib.pprint :only (cl-format)]
         [clojure.contrib.seq :only (indexed)])
@@ -34,14 +34,6 @@
   `(try-times* ~n (fn [] ~@body)))
 
   
-
-(defn date-string 
-  "Get date as string with format yyyyMMdd."
-  ([]
-    (date-string (java.util.Date.)))
-  ([date]
-    (.format (java.text.SimpleDateFormat. "yyyyMMddHHmm") date)))
-
 
 (defmacro ignore-exceptions 
   "Catch any exception and print the message of its root cause."
