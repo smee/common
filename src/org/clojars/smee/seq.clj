@@ -3,6 +3,7 @@
     :doc "useful sequence handling functions"}
   org.clojars.smee.seq
   (:use
+    [org.clojars.smee.time :only (millis-to-time-units)]
     [clojure.contrib.seq :only (indexed)]))
 
 (defn distinct-by
@@ -25,6 +26,21 @@
   "calls callback after every n'th entry in sequence is evaluated with current index as parameter."
   [sequence n callback]
   (map #(do (when (= (rem %1 n) 0) (callback %1)) %2) (iterate inc 1) sequence))
+
+(defn wrap-time-estimator [total-count call-every sequence]
+  (let [starttime (atom nil)
+        callback (fn [i] (do
+                           (if (not @starttime)
+                             (reset! starttime (System/currentTimeMillis))
+                             (let [now (System/currentTimeMillis)
+                                   passed (- now @starttime)
+                                   time-per-item (/ passed (- i call-every))
+                                   items-left (- total-count i)]
+                               (println "processing" i "items took :" (millis-to-time-units passed))
+                               (println "est. time for remaining" items-left "items :" (millis-to-time-units (* time-per-item items-left)))
+                               (.flush System/out)))
+                           ))]
+    (seq-counter sequence call-every callback)))
 
 (defn unchunk 
   "Disable the chunking behaviour introduced in clojure 1.1"
