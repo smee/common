@@ -3,8 +3,8 @@
     :doc "useful misc. functions"}
   org.clojars.smee.util
   (:use [clojure.stacktrace :only (print-cause-trace print-stack-trace)]
-        [clojure.contrib.pprint :only (cl-format)]
-        [clojure.contrib.seq :only (indexed)])
+        [clojure.pprint :only (cl-format)]
+        )
   (:require
     [clojure.string :as cs])
   (:import
@@ -112,3 +112,18 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
   [s]
   (Long/parseLong s))
 
+
+(defn per-thread-singleton
+  "Returns a per-thread singleton function.  f is a function of no
+  arguments that creates and returns some object.  The singleton
+  function will call f only once for each thread, and cache its value
+  for subsequent calls from the same thread.  This allows you to
+  safely and lazily initialize shared objects on a per-thread basis.
+
+  Warning: due to a bug in JDK 5, it may not be safe to use a
+  per-thread-singleton in the initialization function for another
+  per-thread-singleton.  See
+  http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5025230"
+  [f]
+  (let [thread-local (proxy [ThreadLocal] [] (initialValue [] (f)))]
+    (fn [] (.get thread-local))))

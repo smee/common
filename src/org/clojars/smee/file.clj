@@ -3,8 +3,7 @@
     :doc "useful file handling functions"}
   org.clojars.smee.file
   (:use 
-    [clojure.java.io :only (file reader)]
-    [clojure.contrib.string :only (replace-char)])
+    [clojure.java.io :only (file reader)])
   (:import
     [java.io File BufferedReader]))
 
@@ -38,4 +37,4 @@ the regular expression pattern. Per default returns only files, no directories."
   (-> base .toURI (.relativize (.toURI file)) .getPath))
 
 (defn unix-path [^String s]
-  (replace-char \\ \/ s))
+  (.replace \\ \/ s))

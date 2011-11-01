@@ -2,12 +2,12 @@
   ^{:author "Steffen Dienst",
     :doc "useful time handling functions"}
   org.clojars.smee.time
-  (:use [clojure.contrib.def :only (defvar-)]
-        [clojure.contrib.singleton :only (per-thread-singleton)]))
+  (:use 
+        [org.clojars.smee.util :only (per-thread-singleton)]))
 
 
-(defvar- dateformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss,SSS")))
-(defvar- dateonlyformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd")))
+(def ^:private dateformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss,SSS")))
+(def ^:private dateonlyformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd")))
 
 
 (defn parse-time [^String s]

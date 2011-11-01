@@ -4,7 +4,7 @@
   org.clojars.smee.seq
   (:use
     [org.clojars.smee.time :only (millis-to-time-units)]
-    [clojure.contrib.seq :only (indexed)]))
+    ))
 
 (defn distinct-by
   "Returns a lazy sequence of object with duplicates removed,
@@ -49,10 +49,6 @@
     (lazy-seq
       (cons (first s)
         (unchunk (next s))))))
-
-(defn index-filter [pred coll]
-  (when pred
-    (for [[idx elt] (indexed coll) :when (pred elt)] idx)))
 
 (defn take-to-first
   "Returns a lazy sequence of successive items from coll up to
