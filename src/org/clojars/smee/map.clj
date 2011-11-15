@@ -65,3 +65,8 @@ from http://tech.puredanger.com/2010/09/24/meet-my-little-friend-mapmap/"
   "Remove all mappings [ k v] where (f v) is logically true."
   [f m]
   (into {} (for [[k v] m] (when (not (f v)) [k v]))))
+
+(defn reverse-map
+  "Reverse the keys/values of a map"
+  [m]
+  (into {} (map (fn [[k v]] [v k]) m)))

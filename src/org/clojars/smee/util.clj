@@ -4,7 +4,7 @@
   org.clojars.smee.util
   (:use [clojure.stacktrace :only (print-cause-trace print-stack-trace)]
         [clojure.pprint :only (cl-format)]
-        )
+        [clojure.java.io :only (file)])
   (:require
     [clojure.string :as cs])
   (:import
@@ -127,3 +127,10 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
   [f]
   (let [thread-local (proxy [ThreadLocal] [] (initialValue [] (f)))]
     (fn [] (.get thread-local))))
+
+(defn read-properties
+  "Read properties from file-able."
+  [file-able]
+  (with-open [f (java.io.FileInputStream. (file file-able))]
+    (doto (java.util.Properties.)
+      (.load f))))
