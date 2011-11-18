@@ -100,17 +100,17 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
 
 (defn s2f 
   "Parse float string representation."
-  [s]
-  (Float/parseFloat s))
+  ([s] (Float/parseFloat s))
+  ([s dflt] (try (Float/parseFloat s) (catch NumberFormatException dflt))))
 
 (defn s2i 
   "Parse integer string representation."
-  [s]
-  (Integer/parseInt s))
+  ([s] (Integer/parseInt s))
+  ([s dflt] (try (Integer/parseInt s) (catch NumberFormatException dflt))))
 (defn s2l 
   "Parse long string representation."
-  [s]
-  (Long/parseLong s))
+  ([s] (Long/parseLong s))
+  ([s dflt] (try (Long/parseLong s) (catch NumberFormatException dflt))))
 
 
 (defn per-thread-singleton
