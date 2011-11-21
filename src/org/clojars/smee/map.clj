@@ -4,9 +4,10 @@
   org.clojars.smee.map)
 
 (defn map-values 
-  "Change all map values by applying f to each one."
-  [f m]
-  (into {} (for [[k v] m] [k (f v)])))
+  "Change all values or all keys and values by applying a function to each of them."
+  ([vf m] (map-values identity vf m))
+  ([kf vf m]
+  (into {} (for [[k v] m] [(kf k) (vf v)]))))
 
 (defn mapmap
   "Apply kf and vf to a sequence, s, and produce a map of (kf %) to (vf %).
