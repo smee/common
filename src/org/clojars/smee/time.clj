@@ -52,5 +52,13 @@ entries for different time units: :seconds, :minutes, :hours, :days :weeks :year
   "String representation of the time in msec. Uses only time modulo 24h."
   [time]
   (let [m   (apply hash-map (millis-to-time-units time))
-        i2s (fn [i] (if (< i 10) (str "0" i) (str i)))]
-    (str (i2s (:hours m)) \: (i2s (:minutes m)) \: (i2s (:seconds m)) \, (i2s (:milliseconds m)))))
+        i2s (fn [i] (if (< i 10) (str "0" i) (str i)))
+        ms2s (fn [i] (cond (< i 10) (str "00" i) 
+                           (< i 100) (str "0" i) 
+                           :else (str i)))]
+    (reduce (fn [s [k unit]] 
+              (if (< 0 (k m)) (str s (i2s (k m)) unit) s)) 
+              "" 
+              (partition 2 [:years \y :weeks \w :days \d :hours \h :minutes \m :seconds \s ;:milliseconds "ms"
+                            ]))
+            #_(str (i2s (:days m)) \d (i2s (:hours m)) \h (i2s (:minutes m)) \m (i2s (:seconds m)) \s (ms2s (:milliseconds m)) "ms")))
