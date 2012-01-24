@@ -134,3 +134,5 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
   (with-open [f (java.io.FileInputStream. (file file-able))]
     (doto (java.util.Properties.)
       (.load f))))
+
+(defmacro dbg[x] `(let [x# ~x] (println '~x "=" x#) x#))
