@@ -3,7 +3,10 @@
     :doc "useful time handling functions"}
   org.clojars.smee.time
   (:use 
-        [org.clojars.smee.util :only (per-thread-singleton)]))
+        [org.clojars.smee.util :only (per-thread-singleton)])
+  (:import java.sql.Timestamp
+           java.util.Date
+           java.util.Calendar))
 
 
 (def ^:private dateformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss,SSS")))
@@ -62,3 +65,42 @@ entries for different time units: :seconds, :minutes, :hours, :days :weeks :year
               (partition 2 [:years \y :weeks \w :days \d :hours \h :minutes \m :seconds \s ;:milliseconds "ms"
                             ]))
             #_(str (i2s (:days m)) \d (i2s (:hours m)) \h (i2s (:minutes m)) \m (i2s (:seconds m)) \s (ms2s (:milliseconds m)) "ms")))
+
+(defprotocol ^{:added "1.2"} Time-Coercions
+  "Coerce between various 'resource-namish' things."
+  (^{:tag java.sql.Timestamp} as-sql-timestamp [x] "Coerce argument to java.sql.Timestamp.")
+  (^{:tag java.lang.Long} as-unix-timestamp [x] "Coerce argument to time in milliseconds")
+  (^{:tag java.util.Date} as-date [x] "Coerce argument to java.util.Date")
+  (^{:tag java.util.Calendar} as-calendar [x] "Coerce argument to java.util.Calendar"))
+
+(extend-protocol Time-Coercions
+  nil
+  (as-sql-timestamp [_] nil)
+  (as-unix-timestamp [_] nil)
+  (as-date [_] nil) 
+  (as-calendar [_] nil)
+  
+  Long
+  (as-sql-timestamp [i] (Timestamp. i))
+  (as-unix-timestamp [i] i)
+  (as-date [i] (Date. i))
+  (as-calendar [i] (doto (Calendar/getInstance) (.setTimeInMillis i)))
+  
+  Timestamp
+  (as-sql-timestamp [s] s)
+  (as-unix-timestamp [s] (.getTime s))
+  (as-date [s] (Date. (.getTime s)))
+  (as-calendar [s] (doto (Calendar/getInstance) (.setTimeInMillis (.getTime s)))) 
+  
+  java.util.Date
+  (as-sql-timestamp [d] (Timestamp. (.getTime d)))
+  (as-unix-timestamp [d] (.getTime d))
+  (as-date [d] d)
+  (as-calendar [d] (doto (Calendar/getInstance) (.setTime d)))
+  
+  java.util.Calendar
+  (as-sql-timestamp [c] (Timestamp. (.getTimeInMillis c)))
+  (as-unix-timestamp [c] (.getTimeInMillis c))
+  (as-date [c] (.getTime c)) 
+  (as-calendar [c] c)
+  )
