@@ -25,7 +25,7 @@
 (defn seq-counter 
   "calls callback after every n'th entry in sequence is evaluated with current index as parameter."
   [sequence n callback]
-  (map #(do (when (= (rem %1 n) 0) (callback %1)) %2) (iterate inc 1) sequence))
+  (map #(do (when (= (rem %1 n) 0) (callback %1)) %2) (iterate inc 0) sequence))
 
 (defn wrap-time-estimator [total-count call-every sequence]
   (let [starttime (atom nil)
@@ -34,11 +34,11 @@
                              (reset! starttime (System/currentTimeMillis))
                              (let [now (System/currentTimeMillis)
                                    passed (- now @starttime)
-                                   time-per-item (/ passed (- i call-every))
+                                   time-per-item (/ passed i)
                                    items-left (- total-count i)]
-                               (println "processing" i "items took :" (millis-to-time-units passed))
-                               (println "est. time for remaining" items-left "items :" (millis-to-time-units (* time-per-item items-left)))
-                               (.flush System/out)))
+                               (println "#_\"processing" i "items took :" (millis-to-time-units passed) "\"")
+                               (println "#_\"est. time for remaining" items-left "items :" (millis-to-time-units (* time-per-item items-left)) "\"")
+                               (flush)))
                            ))]
     (seq-counter sequence call-every callback)))
 
