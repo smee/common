@@ -71,3 +71,29 @@ from http://tech.puredanger.com/2010/09/24/meet-my-little-friend-mapmap/"
   "Reverse the keys/values of a map"
   [m]
   (into {} (map (fn [[k v]] [v k]) m)))
+
+(defn deep-merge-with
+  "Like merge-with, but merges maps recursively, applying the given fn
+  only when there's a non-map at a particular level.
+
+  (deepmerge + {:a {:b {:c 1 :d {:x 1 :y 2}} :e 3} :f 4}
+               {:a {:b {:c 2 :d {:z 9} :z 3} :e 100}})
+  -> {:a {:b {:z 3, :c 3, :d {:z 9, :x 1, :y 2}}, :e 103}, :f 4}"
+  [f & maps]
+  (apply
+    (fn m [& maps]
+      (if (every? map? maps)
+        (apply merge-with m maps)
+        (apply f maps)))
+    maps))
+
+(defn flatten-keys 
+  "(flatten-keys {:z 1 :a 9 :b {:c Double/NaN :d 1 :e 2 :f {:g 10 :i 22}}})
+=> {[:z] 1, [:a] 9, [:b :c] Double/NaN, [:b :d] 1, [:b :e] 2, [:b :f :g] 10, [:b :f :i] 22} 
+  "
+  ([m] (flatten-keys {} [] m))
+  ([a ks m]
+    (if (map? m)
+      (reduce into (map (fn [[k v]] (flatten-keys a (conj ks k) v)) (seq m)))
+      (assoc a ks m))))
+
