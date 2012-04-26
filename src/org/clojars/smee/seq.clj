@@ -79,11 +79,25 @@
    arg that returns a sequence of the children. Will only be called on
    nodes for which branch? returns true. Root is the root node of the
   tree."
-   [branch? children root]
-   (let [walk (fn walk [[node & nodes]]
-                (lazy-seq
-                 (when node
+  [branch? children root & [max-depth]]
+  (let [max-depth (or max-depth Double/POSITIVE_INFINITY)
+        walk (fn walk [depth [node & nodes]]
+               (lazy-seq
+                 (when (and node (< depth max-depth))
                    (cons node 
                          (when (branch? node)
-                           (walk (concat nodes (children node))))))))]
-     (walk [root])))
+                           (walk (inc depth) (concat nodes (children node))))))))]
+    (walk 0 [root])))
+
+(defn df-tree-seq 
+  "see clojure.core/tree-seq. Takes an additional parameter max-depth that
+specifies when to abort the traversal."
+  [branch? children root & [max-depth]]
+  (let [max-depth (or max-depth Double/POSITIVE_INFINITY)
+        walk (fn walk [depth node]
+               (when (and node (< depth max-depth))
+                 (lazy-seq
+                   (cons node
+                         (when (branch? node)
+                           (mapcat (partial walk (inc depth)) (children node)))))))]
+    (walk 0 root)))
