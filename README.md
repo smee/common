@@ -1,7 +1,7 @@
 # com.github.smee.util
 
 FIXME: write description
-
+[![Build Status](https://secure.travis-ci.org/smee/common.png)](http://travis-ci.org/smee/common])
 ## Usage
 
 FIXME: write
