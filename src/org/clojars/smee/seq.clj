@@ -72,7 +72,7 @@
         (cons run (partition-when f res)))))) 
 
 
-(defn bf-tree-seq
+(defn bf-tree-seq ;;FIXME bug: the depth is associated with each node, not with each invocation of walk!
   "Returns a lazy sequence of the nodes in a tree, via a breadth-first walk.
    branch? must be a fn of one arg that returns true if passed a node
    that can have children (but may not).  children must be a fn of one
@@ -81,13 +81,15 @@
   tree."
   [branch? children root & [max-depth]]
   (let [max-depth (or max-depth Double/POSITIVE_INFINITY)
-        walk (fn walk [depth [node & nodes]]
-               (lazy-seq
-                 (when (and node (< depth max-depth))
-                   (cons node 
-                         (when (branch? node)
-                           (walk (inc depth) (concat nodes (children node))))))))]
-    (walk 0 [root])))
+        walk (fn walk [depth & nodes]
+               ;(println "depth " depth ", nodes" (mapcat keys nodes))
+               (when nodes
+                 (lazy-cat nodes
+                     (when (< depth max-depth)
+                       (->> nodes 
+                         (mapcat children)
+                         (apply walk (inc depth)))))))]
+    (walk 0 root)))
 
 (defn df-tree-seq 
   "see clojure.core/tree-seq. Takes an additional parameter max-depth that
