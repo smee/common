@@ -8,8 +8,8 @@
 
 (defn distinct-by
   "Returns a lazy sequence of object with duplicates removed,
-  where duplicates are defined by applying the function func to each item.
-  Calling (distinct-by _ identity) is equivalent to (clojure.core/distinct _)."
+  where duplicates are defined by comparing the result of applying func to each item.
+  Calling (distinct-by identity _) is equivalent to (clojure.core/distinct _)."
   [func coll]
     (let [step (fn step [xs seen]
                  (lazy-seq
@@ -72,7 +72,7 @@
         (cons run (partition-when f res)))))) 
 
 
-(defn bf-tree-seq ;;FIXME bug: the depth is associated with each node, not with each invocation of walk!
+(defn bf-tree-seq
   "Returns a lazy sequence of the nodes in a tree, via a breadth-first walk.
    branch? must be a fn of one arg that returns true if passed a node
    that can have children (but may not).  children must be a fn of one
