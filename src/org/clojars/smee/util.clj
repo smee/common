@@ -8,7 +8,9 @@
   (:require
     [clojure.string :as cs])
   (:import
-    [java.io File]))
+    [java.io File]
+    [java.security NoSuchAlgorithmException MessageDigest]
+    java.math.BigInteger))
 
 
 (defn try-times*
