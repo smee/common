@@ -136,3 +136,14 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
       (.load f))))
 
 (defmacro dbg[x] `(let [x# ~x] (println '~x "=" x#) x#))
+
+(defn md5
+  "Compute the hex MD5 sum of a byte array."
+  [#^bytes b]
+  (let [alg (doto (MessageDigest/getInstance "MD5")
+              (.reset)
+              (.update b))]
+    (try
+      (.toString (new BigInteger 1 (.digest alg)) 16)
+      (catch NoSuchAlgorithmException e
+        (throw (new RuntimeException e))))))
