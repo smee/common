@@ -100,6 +100,11 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
         (doseq [x xs]
           (cl-format true format-string (map x ks)))))))
 
+(defn s2d 
+  "Parse double string representation."
+  ([s] (Double/parseDouble s))
+  ([s dflt] (try (Double/parseDouble (str s)) (catch NumberFormatException _ dflt))))
+
 (defn s2f 
   "Parse float string representation."
   ([s] (Float/parseFloat s))

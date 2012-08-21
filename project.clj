@@ -1,4 +1,11 @@
-(defproject org.clojars.smee/common "1.2.5"
+(defproject org.clojars.smee/common "1.2.6"
   :description "Common useful functions needed in different projects."
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :url "https://github.com/smee/common"
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 ])
+                 ]
+  :pom-addition [:developers
+                 [:developer [:name "Steffen Dienst"]]]
+            )
+
