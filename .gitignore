@@ -4,3 +4,4 @@ bin/
 .*
 *jar
 pom.xml
+target/
