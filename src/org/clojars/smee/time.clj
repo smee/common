@@ -110,7 +110,9 @@ entries for different time units: :seconds, :minutes, :hours, :days :weeks :year
   ([start-date] (dates-seq start-date (Date.)))
   ([start-date end-date] 
     (when (and start-date end-date) 
-      (let [cal (doto (Calendar/getInstance)
+      (let [start-date (as-date start-date)
+            end-date (as-date end-date)
+            cal (doto (Calendar/getInstance)
                   (.setTime start-date);
                   (.add Calendar/DAY_OF_MONTH 1))
             date (.getTime cal)]
