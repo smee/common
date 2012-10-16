@@ -62,6 +62,15 @@ from http://tech.puredanger.com/2010/09/24/meet-my-little-friend-mapmap/"
 (defn pmapcat [f & colls]
   (apply concat (apply pmap f colls)))
 
+(defn pmap-chunked 
+  "Split all collections `colls` into chunks of length `n` and maps `f` over each chunk in parallel.
+It is most useful when each call to `f` is quite fast so the overhead of parallelizing would be to big. By
+splitting the inputs into chunks that get processed in parallel, it should result in a performance boost.
+This functions is not lazy!"
+  [n f & colls]
+  (let [chunked-colls (map (partial partition-all n) colls)]
+    (apply concat (apply pmap (fn [& colls] (doall (apply map f colls))) chunked-colls))))
+
 (defn dissoc-where-v 
   "Remove all mappings [ k v] where (f v) is logically true."
   [f m]
