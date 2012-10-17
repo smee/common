@@ -154,3 +154,6 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
       (.toString (new BigInteger 1 (.digest alg)) 16)
       (catch NoSuchAlgorithmException e
         (throw (new RuntimeException e))))))
+
+(defn get-classpath "Get sequence of all class path elements." []
+  (seq (.getURLs (java.lang.ClassLoader/getSystemClassLoader))))
