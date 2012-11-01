@@ -66,6 +66,24 @@ entries for different time units: :seconds, :minutes, :hours, :days :weeks :year
                             ]))
             #_(str (i2s (:days m)) \d (i2s (:hours m)) \h (i2s (:minutes m)) \m (i2s (:seconds m)) \s (ms2s (:milliseconds m)) "ms")))
 
+(defn newer-than 
+  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
+after `date`."
+  [date]
+  (let [date (as-date date)] 
+    (fn [file]
+      (let [file-date (as-date (.lastModified file))]
+        (.before date file-date)))))
+
+(defn older-than 
+  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
+before `date`."
+  [date]
+  (let [date (as-date date)] 
+    (fn [file]
+      (let [file-date (as-date (.lastModified file))]
+        (.after date file-date)))))
+
 (defprotocol ^{:added "1.2"} Time-Coercions
   "Coerce between various 'resource-namish' things."
   (^{:tag java.sql.Timestamp} as-sql-timestamp [x] "Coerce argument to java.sql.Timestamp.")
