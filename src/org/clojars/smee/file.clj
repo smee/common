@@ -3,7 +3,8 @@
     :doc "useful file handling functions"}
   org.clojars.smee.file
   (:use 
-    [clojure.java.io :only (file reader)])
+    [clojure.java.io :only (file reader)]
+    [org.clojars.smee.time :only (as-date)])
   (:import
     [java.io File BufferedReader]))
 
@@ -13,7 +14,7 @@ the regular expression pattern. Per default returns only files, no directories."
   ([dirpath] (find-files dirpath #".*")) 
   ([dirpath pattern] (find-files dirpath pattern true))
   ([dirpath pattern files-only?]
-    (for [file (-> dirpath file file-seq) 
+    (for [^File file (-> dirpath file file-seq) 
           :when (re-matches pattern (.getName file))
           :when (or (not files-only?) (.isFile file))]
       file)))
@@ -37,4 +38,22 @@ the regular expression pattern. Per default returns only files, no directories."
   (-> base .toURI (.relativize (.toURI file)) .getPath))
 
 (defn unix-path [^String s]
-  (.replace \\ \/ s))
+  (.replace s \\ \/))
+
+(defn newer-than 
+  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
+after `date`."
+  [date]
+  (let [date (as-date date)] 
+    (fn [^File file]
+      (let [file-date (as-date (.lastModified file))]
+        (.before date file-date)))))
+
+(defn older-than 
+  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
+before `date`."
+  [date]
+  (let [date (as-date date)] 
+    (fn [^File file]
+      (let [file-date (as-date (.lastModified file))]
+        (.after date file-date)))))

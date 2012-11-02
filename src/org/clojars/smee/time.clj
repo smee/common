@@ -4,85 +4,10 @@
   org.clojars.smee.time
   (:use 
         [org.clojars.smee.util :only (per-thread-singleton)])
-  (:import java.sql.Timestamp
+  (:import java.text.SimpleDateFormat 
+           java.sql.Timestamp
            java.util.Date
            java.util.Calendar))
-
-
-(def ^:private dateformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss,SSS")))
-(def ^:private dateonlyformat (per-thread-singleton #(java.text.SimpleDateFormat. "yyyy-MM-dd")))
-
-
-(defn parse-time [^String s]
-  (.getTime (.parse (dateformat) s)))
-
-(defn time-to-string 
-  "Format milliseconds into format \"yyyy-MM-dd HH:mm:ss,SSS\""
-  [t]
-  (.format (dateformat) (java.util.Date. t)))
-
-(defn time-to-date-string 
-  "Format milliseconds into format \"yyyy-MM-dd\""
-  [t]
-  (.format (dateonlyformat) (java.util.Date. t)))
-
-(defn date-string 
-  "Get date as string with format yyyyMMdd."
-  ([]
-    (date-string (java.util.Date.)))
-  ([date]
-    (.format (java.text.SimpleDateFormat. "yyyyMMddHHmm") date)))
-
-(defn millis-to-time-units
-  "Convert time in milliseconds to a seq that contains
-entries for different time units: :seconds, :minutes, :hours, :days :weeks :years"
-  ([time-in-msec] 
-    (millis-to-time-units 
-      []
-      [52 7 24 60 60 1000 1] 
-      time-in-msec))
-  ([result time-unit-durations rest-time]
-    (if (empty? time-unit-durations)
-      (interleave [:years :weeks :days :hours :minutes :seconds :milliseconds] result)
-      ;else
-      (let [duration-in-msec (apply * time-unit-durations)]
-        (recur 
-          (conj result (quot rest-time duration-in-msec))
-          (rest time-unit-durations)
-          (rem rest-time duration-in-msec))))))
-
-(defn millis-to-string 
-  "String representation of the time in msec. Uses only time modulo 24h."
-  [time]
-  (let [m   (apply hash-map (millis-to-time-units time))
-        i2s (fn [i] (if (< i 10) (str "0" i) (str i)))
-        ms2s (fn [i] (cond (< i 10) (str "00" i) 
-                           (< i 100) (str "0" i) 
-                           :else (str i)))]
-    (reduce (fn [s [k unit]] 
-              (if (< 0 (k m)) (str s (i2s (k m)) unit) s)) 
-              "" 
-              (partition 2 [:years \y :weeks \w :days \d :hours \h :minutes \m :seconds \s ;:milliseconds "ms"
-                            ]))
-            #_(str (i2s (:days m)) \d (i2s (:hours m)) \h (i2s (:minutes m)) \m (i2s (:seconds m)) \s (ms2s (:milliseconds m)) "ms")))
-
-(defn newer-than 
-  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
-after `date`."
-  [date]
-  (let [date (as-date date)] 
-    (fn [file]
-      (let [file-date (as-date (.lastModified file))]
-        (.before date file-date)))))
-
-(defn older-than 
-  "Create function that takes a `java.io.File` as parameter and tests, if its `lastmodified` attribute is
-before `date`."
-  [date]
-  (let [date (as-date date)] 
-    (fn [file]
-      (let [file-date (as-date (.lastModified file))]
-        (.after date file-date)))))
 
 (defprotocol ^{:added "1.2"} Time-Coercions
   "Coerce between various 'resource-namish' things."
@@ -122,6 +47,63 @@ before `date`."
   (as-date [c] (.getTime c)) 
   (as-calendar [c] c)
   )
+
+(def ^:private dateformat (per-thread-singleton #(SimpleDateFormat. "yyyy-MM-dd HH:mm:ss,SSS")))
+(def ^:private dateonlyformat (per-thread-singleton #(SimpleDateFormat. "yyyy-MM-dd")))
+
+
+(defn parse-time [^String s]
+  (.getTime (.parse ^SimpleDateFormat (dateformat) s)))
+
+(defn time-to-string 
+  "Format milliseconds into format \"yyyy-MM-dd HH:mm:ss,SSS\""
+  [t]
+  (.format ^SimpleDateFormat (dateformat) (as-date t)))
+
+(defn time-to-date-string 
+  "Format milliseconds into format \"yyyy-MM-dd\""
+  [t]
+  (.format ^SimpleDateFormat (dateonlyformat) (as-date t)))
+
+(defn date-string 
+  "Get date as string with format yyyyMMdd."
+  ([]
+    (date-string (java.util.Date.)))
+  ([date]
+    (.format ^SimpleDateFormat (SimpleDateFormat. "yyyyMMddHHmm") date)))
+
+(defn millis-to-time-units
+  "Convert time in milliseconds to a seq that contains
+entries for different time units: :seconds, :minutes, :hours, :days :weeks :years"
+  ([time-in-msec] 
+    (millis-to-time-units 
+      []
+      [52 7 24 60 60 1000 1] 
+      time-in-msec))
+  ([result time-unit-durations rest-time]
+    (if (empty? time-unit-durations)
+      (interleave [:years :weeks :days :hours :minutes :seconds :milliseconds] result)
+      ;else
+      (let [duration-in-msec (apply * time-unit-durations)]
+        (recur 
+          (conj result (quot rest-time duration-in-msec))
+          (rest time-unit-durations)
+          (rem rest-time duration-in-msec))))))
+
+(defn millis-to-string 
+  "String representation of the time in msec. Uses only time modulo 24h."
+  [time]
+  (let [m   (apply hash-map (millis-to-time-units time))
+        i2s (fn [i] (if (< i 10) (str "0" i) (str i)))
+        ms2s (fn [i] (cond (< i 10) (str "00" i) 
+                           (< i 100) (str "0" i) 
+                           :else (str i)))]
+    (reduce (fn [s [k unit]] 
+              (if (< 0 (k m)) (str s (i2s (k m)) unit) s)) 
+              "" 
+              (partition 2 [:years \y :weeks \w :days \d :hours \h :minutes \m :seconds \s ;:milliseconds "ms"
+                            ]))
+            #_(str (i2s (:days m)) \d (i2s (:hours m)) \h (i2s (:minutes m)) \m (i2s (:seconds m)) \s (ms2s (:milliseconds m)) "ms")))
 
 (defn dates-seq 
   "Create sequence of dates."
