@@ -103,3 +103,11 @@ specifies when to abort the traversal."
                          (when (branch? node)
                            (mapcat (partial walk (inc depth)) (children node)))))))]
     (walk 0 root)))
+
+(defn first-max-key
+  "Returns the first x for which (k x), a number, is greatest."
+  {:static true}
+  ([k x] x)
+  ([k x y] (if (> (k x) (k y)) x y))
+  ([k x y & more]
+   (reduce #(max-key k %2 %1) (max-key k x y) more)))
