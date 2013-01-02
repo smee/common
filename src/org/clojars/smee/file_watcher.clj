@@ -6,7 +6,8 @@
                           WatchService
                           WatchKey
                           WatchEvent)
-           (java.util.concurrent TimeUnit)))
+           (java.util.concurrent TimeUnit))
+  (:require clojure.java.io)) 
 
 (def ^:private kw-to-event
   {:create StandardWatchEventKinds/ENTRY_CREATE
@@ -118,3 +119,26 @@
       (cancel-watch-key watch-key handlers))
     (.close watcher)
     (reset! watch-stats initial-stats)))
+
+;; make sure java.nio.file.Path instances can work with clojure.java.io
+(extend-protocol  clojure.java.io/Coercions
+  java.nio.file.Path
+  (as-file [s] (.toFile ^Path s))
+  (as-url [s] (.toUri ^Path s)))
+
+(comment
+  (defn print-ev
+  [ev ctx]
+  (println "[foo]" ev " --> " ctx)
+  (println "Parent Dir:" (.getParent ctx)))
+  
+  (watch-path "/home/jerry/tmp"
+            :create print-ev
+            :modify print-ev
+            :delete print-ev)
+  ;; change some files
+  (unwatch-path "/home/jerry/tmp")
+  ;; or shutdown all watchers
+  (stop-watchers)
+  )
+
