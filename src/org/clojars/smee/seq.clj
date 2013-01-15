@@ -111,3 +111,8 @@ specifies when to abort the traversal."
   ([k x y] (if (> (k x) (k y)) x y))
   ([k x y & more]
    (reduce #(max-key k %2 %1) (max-key k x y) more)))
+
+(defn find-where 
+  "Find the first element in `coll` where `(pred element)` returns truthy."
+  [pred coll]
+  (some #(when (pred %) %) coll))
