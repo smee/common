@@ -5,18 +5,20 @@
 
 (defn serialize 
   "Serialize the native clojure datastructure obj to file."
-  ([file-name obj] (serialize file-name obj false))  
-  ([file-name obj append?]
-    (with-open [w (writer (file file-name) :append append?)] 
-      (binding [*out* w 
-                *print-length* nil] 
+  ([file-name obj] (serialize file-name obj :append false))  
+  ([file-name obj & opts]
+    (let [{:keys [append pretty]} (if (map? (first opts)) (first opts) (apply hash-map opts))
+          prn (if pretty clojure.pprint/pprint clojure.core/prn)] 
+      (with-open [w (writer (file file-name) :append append)] 
+        (binding [*out* w 
+                  *print-length* nil] 
           (if (seq? obj)
             ;;serialize big sequences without retaining its head...
             (do
               (print \()
               (dorun (map prn obj)) ;;make sure members of sequences may be garbage collected upon realization
               (print \)))  
-            (prn obj))))))
+            (prn obj)))))))
 
 
 (defn deserialize [f]
