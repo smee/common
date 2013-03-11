@@ -118,6 +118,9 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
   "Parse long string representation."
   ([s] (Long/parseLong s))
   ([s dflt] (try (Long/parseLong (str s)) (catch NumberFormatException _ dflt))))
+(defn s2b 
+  "Parse boolean string representation."
+  [s] (Boolean/parseBoolean s))
 
 
 (defn per-thread-singleton
