@@ -147,6 +147,15 @@ Source: http://briancarper.net/blog/527/printing-a-nicely-formatted-plaintext-ta
 
 (defmacro dbg[x] `(let [x# ~x] (println '~x "=" x#) x#))
 
+(defmacro def-let
+  "like let, but binds the expressions globally. From http://www.learningclojure.com/2010/09/astonishing-macro-of-narayan-singhal.html"
+  [bindings & more]
+  (let [let-expr (macroexpand `(let ~bindings))
+        names-values (partition 2 (second let-expr))
+        defs   (map #(cons 'def %) names-values)]
+    (concat (list 'do) defs more)))
+  
+
 (defn md5
   "Compute the hex MD5 sum of a byte array."
   [#^bytes b]
