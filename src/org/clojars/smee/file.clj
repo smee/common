@@ -57,3 +57,14 @@ before `date`."
     (fn [^File file]
       (let [file-date (as-date (.lastModified file))]
         (.after date file-date)))))
+
+(defmacro with-temp-file
+  "Bind var to a new temporary file, invoke body, and delete the
+  file on return."
+  [var & body]
+  `(let [~var (java.io.File/createTempFile "temp" "temp")]
+     (try
+       (do ~@body)
+       (finally
+         (when (.exists ~var)
+           (.delete ~var))))))
