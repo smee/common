@@ -5,7 +5,6 @@
   :url "https://github.com/smee/common"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [conch "0.3.0"]]
-  :java-source-paths ["java-src"]
   :pom-addition [:developers
                  [:developer [:name "Steffen Dienst"]]]
             )
