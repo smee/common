@@ -116,3 +116,38 @@ specifies when to abort the traversal."
   "Find the first element in `coll` where `(pred element)` returns truthy."
   [pred coll]
   (some #(when (pred %) %) coll))
+
+(defn partition-by-equivalence 
+  "Copied from http://www.learningclojure.com/2013/03/partition-by-equivalence.html
+Example: 
+    (partition-by-equivalence (fn [x y] (= (inc x) y)) [0 1 2  0 1 2 3 4 8 9 10])
+    => ((0 1 2) (0 1 2 3 4) (8 9 10))"
+  [f coll]
+  (let [recaccacc (fn [f acc1 acc2 coll]
+                    (if (empty? coll) (reverse (cons (reverse acc2) acc1))
+                      (if (empty? acc2) (recur f acc1 (cons (first coll) acc2) (rest coll))
+                        (if (f (first acc2) (first coll))
+                          (recur f acc1 (cons (first coll) acc2) (rest coll))
+                          (recur f (cons (reverse acc2) acc1) '() coll)))))]
+    (recaccacc f '() '() coll)))
+
+
+(defn partition-by-state 
+  "Like partition-by but calls `f` with a accumulated value. `f` needs to take two parameters:
+an accumulated value and a value of `coll`. The return value is either `nil` if a split should occur or the next value for the accumulator.
+Example:
+    (partition-by-state (fn [acc x] (let [acc (+ acc x)] (if (>= acc 10) nil) acc)) (range 100))
+    => "
+  [new-acc-fn split-fn acc coll]
+  (let [rec-fn (fn rec-fn [res crnt-acc coll]
+                 (lazy-seq 
+                   (if (empty? coll)
+                     (list res)
+                     (let [new-acc (new-acc-fn crnt-acc (first coll))
+                           split? (split-fn new-acc)]
+                       (if split?
+                         (cons res (rec-fn [(first coll)] (new-acc-fn acc (first coll)) (next coll)))
+                         (rec-fn (conj res (first coll)) new-acc (next coll)))))))]
+    (rec-fn [(first coll)] (new-acc-fn acc (first coll)) (next coll))))
+
+;(binding [*print-length* 100 *print-level* 10] (println (partition-by-state + even? 0 (range 20))))
