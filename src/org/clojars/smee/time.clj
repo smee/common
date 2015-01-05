@@ -39,7 +39,9 @@
   (as-sql-timestamp [d] (Timestamp. (.getTime d)))
   (as-unix-timestamp [d] (.getTime d))
   (as-date [d] d)
-  (as-calendar [d] (doto (Calendar/getInstance) (.setTime d)))
+  (as-calendar [d] (doto (Calendar/getInstance) 
+                     (.setTimeZone (java.util.TimeZone/getTimeZone "GMT"))
+                     (.setTime d)))
   
   java.util.Calendar
   (as-sql-timestamp [c] (Timestamp. (.getTimeInMillis c)))
