@@ -7,21 +7,13 @@
   "Change all values or all keys and values by applying a function to each of them."
   ([vf m] (map-values identity vf m))
   ([kf vf m]
-  (into {} (for [[k v] m] [(kf k) (vf v)]))))
+  (into (empty m) (for [[k v] m] [(kf k) (vf v)]))))
 
-(defn mapmap
-  "Apply kf and vf to a sequence, s, and produce a map of (kf %) to (vf %).
-from http://tech.puredanger.com/2010/09/24/meet-my-little-friend-mapmap/"
-  ([vf s]
-     (mapmap identity vf s))
-  ([kf vf s]
-     (zipmap (map kf s)
-              (map vf s))))
 
 (defn remove-empty-values 
   "Remove all key-values where value is empty."
   [m]
-  (into {} (for [[k v] m :when (not (empty? v))] [k v])))
+  (into (empty m) (for [[k v] m :when (not (empty? v))] [k v])))
 
 (defn sort-by-value
   "Sort map by values. If two values are equal, sort by keys. Sort order may be 
@@ -74,12 +66,12 @@ This functions is not lazy!"
 (defn dissoc-where-v 
   "Remove all mappings [ k v] where (f v) is logically true."
   [f m]
-  (into {} (for [[k v] m] (when (not (f v)) [k v]))))
+  (into (empty m) (for [[k v] m] (when (not (f v)) [k v]))))
 
 (defn reverse-map
   "Reverse the keys/values of a map"
   [m]
-  (into {} (map (fn [[k v]] [v k]) m)))
+  (into (empty m) (map (fn [[k v]] [v k]) m)))
 
 (defn deep-merge-with
   "Like merge-with, but merges maps recursively, applying the given fn
@@ -106,3 +98,13 @@ This functions is not lazy!"
       (reduce into (map (fn [[k v]] (flatten-keys a (conj ks k) v)) (seq m)))
       (assoc a ks m))))
 
+(defmacro transform-map
+  "Reduce an associative datastructure into a new one. Assumes that `input` can be transient."
+  {:style/indent 2}
+  [input [k v] & body]
+  `(let [input# ~input]
+     (persistent!
+      (reduce-kv (fn [m# ~k ~v]
+                   (assoc! m# ~k ~@body))
+                 (transient (empty input#))
+                 input#))))
