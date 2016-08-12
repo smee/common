@@ -3,10 +3,11 @@
     :doc "useful file handling functions"}
   org.clojars.smee.file
   (:use 
-    [clojure.java.io :only (file reader)]
+    [clojure.java.io :only (file reader as-file)]
     [org.clojars.smee.time :only (as-date)])
   (:import
-    [java.io File BufferedReader]))
+   [java.io File BufferedReader]
+   java.nio.file.Paths))
 
 (defn find-files 
   "Traverse directory dirpath depth first, return all files matching
@@ -67,4 +68,14 @@ before `date`."
        (do ~@body)
        (finally
          (when (.exists ~var)
-           (.delete ~var))))))
+               (.delete ~var))))))
+
+(defn relative-path
+"Create a string describing the path `file` relative to `base`"
+  [base file]
+  (let [base (Paths/get (.toURI (as-file base)))
+        file (Paths/get (.toURI (as-file file)))]
+    (-> base 
+        (.relativize file)
+        str
+        (.replace "\\" "/"))))
