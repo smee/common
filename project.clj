@@ -1,4 +1,4 @@
-(defproject org.clojars.smee/common "1.2.9-SNAPSHOT"
+(defproject org.clojars.smee/common "1.2.9"
   :description "Common useful functions needed in different projects."
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

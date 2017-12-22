@@ -105,6 +105,6 @@ This functions is not lazy!"
   `(let [input# ~input]
      (persistent!
       (reduce-kv (fn [m# ~k ~v]
-                   (assoc! m# ~k ~@body))
+                   (assoc! m# ~k (do ~@body)))
                  (transient (empty input#))
                  input#))))
